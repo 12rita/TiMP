@@ -1,33 +1,52 @@
 #include "stdafx.h"
-#include <fstream>
+#include <string>
+#include <stdlib.h>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <iomanip>
+#include <conio.h>
+#include <time.h>
 
 using namespace std;
 
-int _tmain(int argc, _TCHAR* argv[])
+int main()
 {
-	char  name[255];
-	char string[255];
-	char* result;
-	
-	cin >> name;
-	ifstream fin(name);	
-	while (!fin.eof()) {
-		fin.getline(name, 255);	
-		if ((strstr(name, "\func")) != NULL)
-		{ 
-			result = strstr(name, "\func"); 
-			result+=6;
-			if (strstr(result, "*/") != NULL) 
-			{
-				strcpy_s(string, result);
-				string[strlen(result) - 2] = '\0';
-				cout << string << endl;
-			}
-			else
-			cout << result << endl;
-		}
-	}
+	string buf;
+	ifstream file("text.txt");
+	getline(file, buf, '\0');
+	//cout << buf<<endl<<"nasha rabota"<<endl;
+	file.close();
+	int size = buf.length();
+	int i = 0;
 
-	return 0;
+	while(i<size)
+	{
+		if ((buf[i] == '/') && (buf[i+1] == '*') && (buf[i+2] == '*'))
+		{
+			i += 3;
+			while (buf[i] != '\\')
+			{
+				i++;
+			}
+
+			while ((buf[i] != ' ') && (buf[i] != '\n'))
+			{
+				i++;
+			}
+			i++;
+
+			while ((buf[i] != '*') || (buf[i + 1] != '/'))
+			{
+				if (buf[i] == '\n') cout << ' ';
+				else cout<<buf[i];
+				i++;
+			}
+			cout << endl;
+			i++;
+		}
+		i++;
+	}
+	system("pause");
+    return 0;
 }
