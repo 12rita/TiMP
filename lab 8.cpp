@@ -2,74 +2,97 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <vector>
+#include <algorithm>
+
 using namespace std;
 
-
-class Base {
+class base {
 public:
-	virtual void show() = 0;
-	void setData(int v) {
-		value = v;
+	virtual void show() = 0; //pure virt func
+	base(int value) {
+		this->value = value;
 	}
 protected:
 	int value;
 };
-
-class A : public Base {
+class a :public base {
 public:
-	void show() { cout << "class A: " << value << endl; }
+	a(int value) : base(value) {}
+	void show() {
+		cout << "class A value: " << value << endl;
+	}
 };
-
-class B : public Base {
+class b :public base {
 public:
-	void show() { cout << "class B: " << value << endl; }
+	b(int value) : base(value) {}
+	void show() {
+		cout << "class B value: " << value << endl;
+	}
 };
-
-class C : public Base {
+class c :public base {
 public:
-	void show() { cout << "class C: " << value << endl; }
+	c(int value) : base(value) {}
+	void show() {
+		cout << "class C value: " << value << endl;
+	}
 };
-
-map <int, Base*> mbase;
+class functor {
+public:
+	virtual base* operator()(int value) = 0;
+};
+class funcA :public functor {
+public:
+	base* operator()(int value) {
+		return (new a(value));
+	}
+};
+class funcB :public functor {
+	base* operator()(int value) {
+		return (new b(value));
+	}
+};
+class funcC :public functor {
+	base* operator()(int value) {
+		return (new c(value));
+	}
+};
 
 int main()
 {
+	map<string, functor*> fab;
+	vector<base*> vcl;
+	funcA aa;
+	funcB bb;
+	funcC cc;
+	fab["A"] = &aa;
+	fab["B"] = &bb;
+	fab["C"] = &cc;
 	int N;
-	int data;
 	cin >> N;
 	string command;
-	int k = 0;
-	for (int i = 0; i < N; i++)
-	{
-		cin >> command;
+	cin >> command;
+
+	for (int i = 0; i < N; i++) {
+		if (command == "create") {
+			string cl;
+			int value;
+			cin >> cl >> value;
+			functor *fc = fab[cl];
+			if (fc == NULL) {
+				cout << "Only A B C classes availible" << endl;
+			}
+			else 
+			{
+				base *bcl = (*fc)(value);
+				vcl.push_back(bcl);
+			}
+		}
 		if (command == "showall") {
-			for (int j = 0; j < mbase.size(); j++)
-				mbase[j] -> show();
+			for_each(vcl.begin(), vcl.end(), [](base *lb) {lb->show(); });
 		}
-		if (command == "create")
-		{
-			cin >> command;
-			if (command == "A") {
-				cin >> data;
-				mbase[k] = new A;
-				mbase[k] -> setData(data);
-				k++;
-			}
-			if (command == "B") {
-				cin >> data;
-				mbase[k] = new B;
-				mbase[k] -> setData(data);
-				k++;
-			}
-			if (command == "C") {
-				cin >> data;
-				mbase[k] = new C;
-				mbase[k] -> setData(data);
-				k++;
-			}
-		}
+		cin >> command;
 	}
-//system("pause");
+
     return 0;
 }
-
